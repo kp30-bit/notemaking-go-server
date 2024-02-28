@@ -1,0 +1,14 @@
+Project - Note Making backend server
+Login/Register Feature - Postmans
+Api routes for login and register.
+Api routes for adding, deleting and editing notes.
+
+Jwt authentication during login
+
+/login
+/register
+/logout
+/createNotes
+/updateNotes
+/GetNotes
+/DeleteNotes

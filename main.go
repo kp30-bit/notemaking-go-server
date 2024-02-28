@@ -18,14 +18,9 @@ import (
 )
 
 type User struct {
-	Username string `json:"username" bson:"username"`
+	Username string `json:"username" bson:"username"` //json and bson  tags are used to map json fields with the corresponding names during marshalling and unmarshalling
 	Password string `json:"password" bson:"password"`
 	Notes    string `json:"notes" bson:"notes"`
-}
-
-type Claims struct {
-	Username string `json:"username"`
-	jwt.StandardClaims
 }
 
 var collection *mongo.Collection
@@ -83,15 +78,16 @@ func GenerateJWT() (string, error) {
 	}
 	return tokenString, nil
 }
-func main() { // connection to mongoDB
-	// Use the SetServerAPIOptions() method to set the version of the Stable API on the client
-	router := mux.NewRouter()
+func main() {
+	router := mux.NewRouter() //creating a new gorilla mux router
+	//creating all the routes/ api endpoints
 	router.HandleFunc("/login", Login).Methods("POST")
 	router.HandleFunc("/register", Register).Methods("POST")
 	router.Handle("/getnotes", authenticateMiddleware(http.HandlerFunc(GetNotes))).Methods("GET")
 	router.Handle("/deleteuser", authenticateMiddleware(http.HandlerFunc(DeleteUser))).Methods("DELETE")
 	router.Handle("/updatenote", authenticateMiddleware(http.HandlerFunc(UpdateNote))).Methods("UPDATE")
-	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+	//router.Handle is used when you want to register a custom handler object that implements the http.Handler interface, while router.HandleFunc is used when you want to define a handler function inline using http.HandlerFunc.
+	serverAPI := options.ServerAPI(options.ServerAPIVersion1) // In the MongoDB Go driver, the options.ServerAPI function is used to specify the version of the server API to be used when communicating with a MongoDB server.
 	opts := options.Client().ApplyURI("mongodb+srv://kamalpratik:kamal@makenotes.qtyi5iw.mongodb.net/?retryWrites=true&w=majority&appName=MakeNotes").SetServerAPIOptions(serverAPI)
 	// Create a new client and connect to the server
 	client, err := mongo.Connect(context.Background(), opts)
@@ -144,7 +140,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	// 	http.Error(w, "Invalid username or password", http.StatusUnauthorized)
 	// 	return
 	// }
-	passErr := bcrypt.CompareHashAndPassword([]byte(result.Password), []byte(user.Password))
+	passErr := bcrypt.CompareHashAndPassword([]byte(result.Password), []byte(user.Password)) //compares the encrypted and decrypted password
 	if passErr != nil {
 		log.Println(passErr)
 		w.Write([]byte(`{"response":"Wrong Password!"}`))
@@ -182,7 +178,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"message":"` + err.Error() + `"}`))
 		return
 	}
-	json.NewEncoder(w).Encode(result)
+	json.NewEncoder(w).Encode(result) //this line of code creates a new JSON encoder that writes to an http.ResponseWriter and then encodes the result data structure into JSON format, writing the JSON-encoded data to the HTTP response.
 	fmt.Println(result)
 }
 

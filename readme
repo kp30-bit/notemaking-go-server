@@ -1,14 +1,4 @@
-Project - Note Making backend server
-Login/Register Feature - Postmans
-Api routes for login and register.
-Api routes for adding, deleting and editing notes.
-
-Jwt authentication during login
-
-/login
-/register
-/logout
-/createNotes
-/updateNotes
-/GetNotes
-/DeleteNotes
+This is a go lang backend server capable of storing notes for its users implemted using REST api's. 
+Login Credeniitals and notes specific to each user is stored in mongoDB.
+Password are encrypted before getting stored on the database and decrypted at login for validation.
+Login sessions are enabled using JWT tokens which is created while login. The jwt token is essential for all the crud operations after successful login.

@@ -85,7 +85,7 @@ func main() {
 	router.HandleFunc("/register", Register).Methods("POST")
 	router.Handle("/getnotes", authenticateMiddleware(http.HandlerFunc(GetNotes))).Methods("GET")
 	router.Handle("/deleteuser", authenticateMiddleware(http.HandlerFunc(DeleteUser))).Methods("DELETE")
-	router.Handle("/updatenote", authenticateMiddleware(http.HandlerFunc(UpdateNote))).Methods("UPDATE")
+	router.Handle("/updatenote", authenticateMiddleware(http.HandlerFunc(UpdateNote))).Methods("PUT")
 	//router.Handle is used when you want to register a custom handler object that implements the http.Handler interface, while router.HandleFunc is used when you want to define a handler function inline using http.HandlerFunc.
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1) // In the MongoDB Go driver, the options.ServerAPI function is used to specify the version of the server API to be used when communicating with a MongoDB server.
 	opts := options.Client().ApplyURI("mongodb+srv://kamalpratik:kamal@makenotes.qtyi5iw.mongodb.net/?retryWrites=true&w=majority&appName=MakeNotes").SetServerAPIOptions(serverAPI)
@@ -207,12 +207,12 @@ func GetNotes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	passErr := bcrypt.CompareHashAndPassword([]byte(result.Password), []byte(user.Password))
-	if passErr != nil {
-		log.Println(passErr)
-		w.Write([]byte(`{"response":"Wrong Password!"}`))
-		return
-	}
+	// passErr := bcrypt.CompareHashAndPassword([]byte(result.Password), []byte(user.Password))
+	// if passErr != nil {
+	// 	log.Println(passErr)
+	// 	w.Write([]byte(`{"response":"Wrong Password!"}`))
+	// 	return
+	// }
 
 	fmt.Fprintf(w, "Notes : %s\n", result.Notes)
 
@@ -284,23 +284,21 @@ func UpdateNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	passErr := bcrypt.CompareHashAndPassword([]byte(result.Password), []byte(user.Password))
-	if passErr != nil {
-		log.Println(passErr)
-		w.Write([]byte(`{"response":"Wrong Password!"}`))
-		return
-	} else {
-		update := bson.M{
-			"$set": bson.M{
-				"notes": user.Notes,
-			},
-		}
-		_, err := collection.UpdateOne(context.Background(), result, update)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Fprintf(w, "Note Updated for %s\n", result.Username)
-
+	// passErr := bcrypt.CompareHashAndPassword([]byte(result.Password), []byte(user.Password))
+	// if passErr != nil {
+	// 	log.Println(passErr)
+	// 	w.Write([]byte(`{"response":"Wrong Password!"}`))
+	// 	return
+	// } else {
+	update := bson.M{
+		"$set": bson.M{
+			"notes": user.Notes,
+		},
 	}
+	_, errrr := collection.UpdateOne(context.Background(), result, update)
+	if errrr != nil {
+		log.Fatal(err)
+	}
+	fmt.Fprintf(w, "Note Updated for %s\n", result.Username)
 
 }
